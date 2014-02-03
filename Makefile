@@ -98,8 +98,11 @@ $(FASTAHACK):
 $(BINS): $(BIN_SOURCES) $(OBJECTS) $(SMITHWATERMAN) $(FASTAHACK) $(DISORDER) $(LEFTALIGN) $(INDELALLELE)
 	$(CXX) $(OBJECTS) $(SMITHWATERMAN) $(REPEATS) $(DISORDER) $(LEFTALIGN) $(INDELALLELE) $(FASTAHACK) tabixpp/tabix.o tabixpp/bgzf.o $@.cpp -o $@ $(INCLUDES) $(LDFLAGS) $(CXXFLAGS)
 
+libvcf.a: $(OBJECTS) $(TABIX)
+	ar rcs $@ $(OBJECTS) tabixpp/tabix.o
+
 clean:
-	rm -f $(BINS) $(OBJECTS)
+	rm -f $(BINS) $(OBJECTS) libvcf.a
 	cd tabixpp && make clean
 	cd smithwaterman && make clean
 	cd fastahack && make clean
