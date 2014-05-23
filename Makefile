@@ -79,7 +79,7 @@ TABIX = tabixpp/tabix.o
 
 FASTAHACK = fastahack/Fasta.o
 
-SMITHWATERMAN = smithwaterman/SmithWatermanGotoh.o 
+SMITHWATERMAN = smithwaterman/SmithWatermanGotoh.o
 
 REPEATS = smithwaterman/Repeats.o
 
@@ -148,11 +148,23 @@ $(SHORTBINS):
 $(BINS): $(BIN_SOURCES) $(OBJECTS) $(SMITHWATERMAN) $(FASTAHACK) $(DISORDER) $(LEFTALIGN) $(INDELALLELE) $(SSW) $(FSOM) $(FILEVERCMP)
 	$(CXX) $(OBJECTS) $(SMITHWATERMAN) $(REPEATS) $(DISORDER) $(LEFTALIGN) $(INDELALLELE) $(SSW) $(FASTAHACK) $(FSOM) $(FILEVERCMP) tabixpp/tabix.o tabixpp/bgzf.o src/$(notdir $@).cpp -o $@ $(INCLUDES) $(LDFLAGS) $(CXXFLAGS)
 
-libvcf.a: $(OBJECTS) $(TABIX)
-	ar rcs $@ $(OBJECTS) tabixpp/tabix.o
+TABIXPP_LOBJS= tabixpp/bgzf.o \
+			   tabixpp/kstring.o \
+			   tabixpp/knetfile.o \
+			   tabixpp/index.o \
+			   tabixpp/bedidx.o \
+			   tabixpp/tabix.o
+
+SW_LOBJS= $(REPEATS) \
+		  $(LEFTALIGN) \
+		  $(INDELALLELE) \
+		  $(SMITHWATERMAN)
+
+libvcf.a: $(OBJECTS) $(TABIX) $(SMITHWATERMAN)
+	ar rcs $@ $(OBJECTS) $(TABIXPP_LOBJS) $(SW_LOBJS)
 
 clean:
-	rm -f $(BINS) $(OBJECTS) libvcf.a
+	rm -f $(BINS) $(OBJECTS) libvcf.a disorder.o
 	rm -f ssw_cpp.o ssw.o
 	cd tabixpp && make clean
 	cd smithwaterman && make clean
